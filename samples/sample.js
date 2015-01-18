@@ -1,4 +1,4 @@
-var ss = require('../index.js');
+var ss = require('stream-scheduler');
 
 module.exports = (function() {
 	var options = {
