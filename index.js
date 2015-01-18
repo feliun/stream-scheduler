@@ -3,16 +3,17 @@ var https = require('https');
 var http = require('http');
 var config = require('./config');
 
-var interval, onData, onEnd, onError, url, handler, 
+var interval, onData, onEnd, onError, url, 
+	handler, 
 	isExecuting, lastExecutionTime, lastErrorTime;
 
 function configure(options) {
 	interval = options.interval || config.options.interval;
-	onData = options.onData || _.noop();
-	onEnd = options.onEnd || _.noop();
-	onError = options.onError || _.noop();
+	onData = options.onData || _.noop;
+	onEnd = options.onEnd || _.noop;
+	onError = options.onError || _.noop;
 	url = options.url;
-	if (!url) return onError("A url is required to stream data from");
+	if (!url) return onError("A url is required to stream data");
 	handler = url.slice(0, 5) === 'https' ? https : http;
 	isExecuting = false;
 
@@ -34,7 +35,7 @@ function configure(options) {
 	}
 
 	if (options.startNow) executeRequest();
-	setInterval(executeRequest, interval);
+	setInterval(executeRequest, interval * 1000);
 }
 
 function isExecuting() { 
