@@ -29,7 +29,7 @@ function configure(options) {
 		lockExecution();
 		handler.get(url, function(response) {
         	response.on('data', function(chunk) { onData(chunk); })
-        			.on('end', executeInSeries([ onEnd, unlockExecution, setLastExecutionTime ]))
+        			.on('end', function() { executeInSeries([ onEnd, unlockExecution, setLastExecutionTime ]) })
         			.on('error', function(err){ executeInSeries([ onError.bind(null, err), unlockExecution, setLastErrorTime ]) });
 		});
 	}
@@ -50,14 +50,9 @@ function startExecution() {
 	if (!isExecuting) executeRequest();
 }
 
-function stopExecution() {
-	handler && handler.abort();
-}
-
 module.exports = {
 	init: configure,
 	isExecuting: isExecuting,
 	startExecution: startExecution,
-	stopExecution: stopExecution,
 	lastExecutionTime: lastExecutionTime
 }
