@@ -3,16 +3,18 @@ var https = require('https');
 var http = require('http');
 var config = require('./config');
 
-module.exports = function(options) {
-	var interval = options.interval || config.options.interval;
-	var onData = options.onData || _.noop();
-	var onEnd = options.onEnd || _.noop();
-	var onError = options.onError || _.noop();
-	var url = options.url;
+var interval, onData, onEnd, onError, url, handler, 
+	isExecuting, lastExecutionTime, lastErrorTime;
+
+function configure(options) {
+	interval = options.interval || config.options.interval;
+	onData = options.onData || _.noop();
+	onEnd = options.onEnd || _.noop();
+	onError = options.onError || _.noop();
+	url = options.url;
 	if (!url) return onError("A url is required to stream data from");
-	var handler = url.slice(0, 5) === 'https' ? https : http;
-	var isExecuting = false;
-	var lastExecutionTime, lastErrorTime;
+	handler = url.slice(0, 5) === 'https' ? https : http;
+	isExecuting = false;
 
 	var executeInSeries = function(fnList) { _.each(fnList, function(fn) { fn(); }) }
 	
@@ -33,27 +35,28 @@ module.exports = function(options) {
 
 	if (options.startNow) executeRequest();
 	setInterval(executeRequest, interval);
+}
 
-	function isExecuting() { 
-		return isExecuting; 
-	}
+function isExecuting() { 
+	return isExecuting; 
+}
 
-	function lastExecutionTime() {
-		return lastExecutionTime;
-	}
-	
-	function startExecution() {
-		if (!isExecuting) executeRequest();
-	}
+function lastExecutionTime() {
+	return lastExecutionTime;
+}
 
-	function stopExecution() {
-		handler.abort();
-	}
+function startExecution() {
+	if (!isExecuting) executeRequest();
+}
 
-	return {
-		isExecuting: isExecuting,
-		startExecution: startExecution,
-		stopExecution: stopExecution,
-		lastExecutionTime: lastExecutionTime
-	}
+function stopExecution() {
+	handler && handler.abort();
+}
+
+module.exports = {
+	init: configure,
+	isExecuting: isExecuting,
+	startExecution: startExecution,
+	stopExecution: stopExecution,
+	lastExecutionTime: lastExecutionTime
 }
