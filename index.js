@@ -25,10 +25,10 @@ module.exports = function(options) {
 	var executeRequest = function() {
 		lockExecution();
 		handler.get(url, function(response) {
-        	response.on('data', executeInSeries([ onData.bind(null, response) ]))
+        	response.on('data', function(chunk) { onData(chunk); })
         			.on('end', executeInSeries([ onEnd, unlockExecution, setLastExecutionTime ]))
-        			.on('error', executeInSeries([ onError, unlockExecution, setLastErrorTime ]));
-		}
+        			.on('error', function(err){ executeInSeries([ onError.bind(null, err), unlockExecution, setLastErrorTime ]) });
+		});
 	}
 
 	if (options.startNow) executeRequest();
@@ -47,7 +47,7 @@ module.exports = function(options) {
 	}
 
 	function stopExecution() {
-
+		handler.abort();
 	}
 
 	return {
