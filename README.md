@@ -15,8 +15,11 @@ var options = {
   onEnd: <callback to execute when the streaming finishes>,
   onError: <callback to execute when an error occurs in the streaming or in the scheduling>,
   startNow: <forces the component to trigger the process inmediately>
+  csvConfig: <config options to read a csv file streaming from a url>
 }
 ```
+
+The **csvConfig** allows you to parse and transform a csv file, as long as your URL returns one. It is using the fast-csv module, so you can visit [their page](https://github.com/C2FO/fast-csv) to check your available options.
 
 Once you've done that, just require and initialise the stream-scheduler:
 
