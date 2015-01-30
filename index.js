@@ -2,9 +2,10 @@ var _ = require('lodash');
 var https = require('https');
 var http = require('http');
 var config = require('./config');
+var csv = require("fast-csv");
 
 var interval, onData, onEnd, onError, url, 
-	handler, 
+	handler, csvConfig,
 	isExecuting, lastExecutionTime, lastErrorTime;
 
 var executeInSeries = function(fnList) { _.each(fnList, function(fn) { fn(); }) };
@@ -18,6 +19,7 @@ var setLastErrorTime = function() { lastErrorTime = new Date().getTime(); };
 var executeRequest = function() {
 	executeInSeries([ lockExecution, onStartExec ]);
 	handler.get(url, function(response) {
+		if (csvConfig) response = csv.fromStream(response, csvConfig);
     	response.on('data', function(chunk) { onData(chunk); })
     			.on('end', function() { executeInSeries([ onEnd, unlockExecution, setLastExecutionTime ]) })
     			.on('error', function(err){ executeInSeries([ onError.bind(null, err), unlockExecution, setLastErrorTime ]) });
@@ -26,6 +28,7 @@ var executeRequest = function() {
 
 function configure(options) {
 	interval = options.interval || config.options.interval;
+	csvConfig = options.csvConfig;
 	onStartExec = options.onStartExec || _.noop;
 	onData = options.onData || _.noop;
 	onEnd = options.onEnd || _.noop;

@@ -1,4 +1,4 @@
-var ss = require('stream-scheduler');
+var ss = require('../index');
 
 module.exports = (function() {
 	var options = {
@@ -7,7 +7,7 @@ module.exports = (function() {
 			console.log('Just started!');
 		},
 		onData: function(chunk) {
-			//console.log('Received: ', chunk.toString()); //Comment this out to perceive the rest of the execution
+			console.log('Received: ', chunk); //Comment this out to perceive the rest of the execution
 		},
 		onEnd: function() {
 			console.log('Finished!');
@@ -15,7 +15,10 @@ module.exports = (function() {
 		onError: function(err) {
 			console.log('Houston, we\'ve got a problem: ', err);
 		},
-		url: 'http://www.theverge.com/',
+		url: 'http://localhost:3000/mycsv',
+		csvConfig: {
+			headers: true
+		},
 		startNow: true
 	}
 	ss.init(options);
