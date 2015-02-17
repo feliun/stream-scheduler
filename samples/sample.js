@@ -1,26 +1,36 @@
 var ss = require('../index');
+var JSONStream = require('JSONStream');
+var es = require('event-stream');
 
 module.exports = (function() {
+	
+	var stream1 = JSONStream.parse('.*');
+	stream1.on('data', function (item) { console.log('This could process a json!', item); });
+    stream1.on('end', function () { console.log('end JSON!'); });
+
+	var stream2 = es.mapSync(function (data) {
+	    console.log('Stream 2');
+	    return data;
+	});
+
+	var stream3 = es.through(function write(data) {
+			console.log('Stream 3');
+			this.emit('data', data);
+		},
+		function end() {
+			console.log('End Stream 3');
+			this.emit('end');
+		}
+	);
+
 	var options = {
 		interval: 6, //6 seconds to run the job
-		onStartExec: function() {
-			console.log('Just started!');
-		},
-		onData: function(chunk) {
-			console.log('Received: ', chunk); //Comment this out to perceive the rest of the execution
-		},
-		onEnd: function() {
-			console.log('Finished!');
-		},
-		onError: function(err) {
-			console.log('Houston, we\'ve got a problem: ', err);
-		},
-		url: 'http://localhost:3000/mycsv',
-		csvConfig: {
-			headers: true
-		},
+		onStartExec: function() { console.log('Just started!'); },
+		url: 'http://echo.jsontest.com/insert-key-here/insert-value-here/key/value',
+		pipeline: [ stream1, stream2, stream3 ],
 		startNow: true
 	}
+
 	ss.init(options);
 
 	setTimeout(function() {

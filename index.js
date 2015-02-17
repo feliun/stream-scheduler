@@ -2,10 +2,8 @@ var _ = require('lodash');
 var https = require('https');
 var http = require('http');
 var config = require('./config');
-var csv = require("fast-csv");
 
-var interval, onData, onEnd, onError, url, 
-	handler, csvConfig,
+var interval, url, pipeline, handler,
 	isExecuting, lastExecutionTime, lastErrorTime;
 
 var executeInSeries = function(fnList) { _.each(fnList, function(fn) { fn(); }) };
@@ -19,24 +17,22 @@ var setLastErrorTime = function() { lastErrorTime = new Date().getTime(); };
 var executeRequest = function() {
 	executeInSeries([ lockExecution, onStartExec ]);
 	handler.get(url, function(response) {
-		if (csvConfig) response = csv.fromStream(response, csvConfig);
-    	response.on('data', function(chunk) { onData(chunk); })
-    			.on('end', function() { executeInSeries([ onEnd, unlockExecution, setLastExecutionTime ]) })
-    			.on('error', function(err){ executeInSeries([ onError.bind(null, err), unlockExecution, setLastErrorTime ]) });
+		_.each(pipeline, function(stream) { response.pipe(stream); });
+		response.on('end', function() { executeInSeries([ unlockExecution, setLastExecutionTime ]) })
+				.on('error', function(err){ executeInSeries([ unlockExecution, setLastErrorTime ]) });
 	});
 }
 
 function configure(options) {
 	interval = options.interval || config.options.interval;
-	csvConfig = options.csvConfig;
+	pipeline = options.pipeline;
 	onStartExec = options.onStartExec || _.noop;
-	onData = options.onData || _.noop;
-	onEnd = options.onEnd || _.noop;
-	onError = options.onError || _.noop;
 	url = options.url;
-	if (!url) return onError("A url is required to stream data");
 	handler = url.slice(0, 5) === 'https' ? https : http;
 	isExecuting = false;
+	
+	if (_.isEmpty(pipeline)) throw new Error("At least one stream is required to provide functionality");
+	if (!url) throw new Error("A url is required to stream data");
 
 	if (options.startNow) executeRequest();
 	setInterval(executeRequest, interval * 1000);
