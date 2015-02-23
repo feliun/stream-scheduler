@@ -25,7 +25,14 @@ module.exports = (function() {
 
 	var options = {
 		schedule: '42 * * * *',
-		onStartExec: function() { console.log('Just started!'); },
+		onStartExec: function() {
+			//the JSONStream library does not play well with setInterval unless we reset it
+			stream1 = JSONStream.parse('.*');
+			stream1.on('data', function (item) { console.log('This could process a json!', item); });
+		    stream1.on('end', function () { console.log('end JSON!'); });
+		    ss.updatePipeline([ stream1, stream2, stream3 ]);
+			console.log('Just started!'); 
+		},
 		url: 'http://echo.jsontest.com/insert-key-here/insert-value-here/key/value',
 		pipeline: [ stream1, stream2, stream3 ],
 		startNow: true

@@ -58,9 +58,14 @@ function startExecution() {
 	if (!isExecuting) executeRequest();
 }
 
+function updatePipeline(_pipeline) {
+	pipeline = _pipeline;
+}
+
 module.exports = {
 	init: configure,
 	isExecuting: isExecuting,
+	updatePipeline: updatePipeline,
 	startExecution: startExecution,
 	lastExecutionTime: lastExecutionTime
 }
