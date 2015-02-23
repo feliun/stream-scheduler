@@ -24,12 +24,9 @@ module.exports = (function() {
 	);
 
 	var options = {
-		interval: 6, //6 seconds to run the job
+		schedule: '42 * * * *',
 		onStartExec: function() { console.log('Just started!'); },
 		url: 'http://echo.jsontest.com/insert-key-here/insert-value-here/key/value',
-		onData: function(chunk) { console.log('onData stream4'); },
- 		onEnd: function() { console.log('onEnd stream4'); },
- 		onError: function(err) { console.log('Houston, we\'ve got a problem: ', err); },
 		pipeline: [ stream1, stream2, stream3 ],
 		startNow: true
 	}

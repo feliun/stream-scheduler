@@ -1,6 +1,6 @@
 {
   "name": "stream-scheduler",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "description": "Schedule a job that reads and process a http(s) stream",
   "main": "index.js",
   "scripts": {
@@ -20,7 +20,8 @@
     "lodash": "~2.4.x",
     "stream-scheduler": "1.0.0",
     "JSONStream": "*",
-    "event-stream": "3.2.2"
+    "event-stream": "3.2.2",
+    "node-schedule": "0.1.16"
   },
   "author": "feliun",
   "license": "MIT",

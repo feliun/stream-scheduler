@@ -1,9 +1,10 @@
 var _ = require('lodash');
 var https = require('https');
 var http = require('http');
+var schedule = require('node-schedule');
 var config = require('./config');
 
-var interval, onData, onEnd, onError, url, pipeline, handler,
+var interval, scheduleConfig, onData, onEnd, onError, url, pipeline, handler,
 	isExecuting, lastExecutionTime, lastErrorTime;
 
 var executeInSeries = function(fnList) { _.each(fnList, function(fn) { fn(); }) };
@@ -25,7 +26,8 @@ var executeRequest = function() {
 }
 
 function configure(options) {
-	interval = options.interval || config.options.interval;
+	interval = options.interval;
+	scheduleConfig = options.schedule;
 	pipeline = options.pipeline;
 	onStartExec = options.onStartExec || _.noop;
 	onData = options.onData || _.noop;		
@@ -37,9 +39,11 @@ function configure(options) {
 	
 	if (_.isEmpty(pipeline) && !options.onData) throw new Error("At least one stream is required to provide functionality");
 	if (!url) throw new Error("A url is required to stream data");
+	if (!scheduleConfig && !interval) throw new Error("It is mandatory to specify an interval or a schedule to run the request");
 
 	if (options.startNow) executeRequest();
-	setInterval(executeRequest, interval * 1000);
+	if (interval) setInterval(executeRequest, interval * 1000);
+	if (scheduleConfig) schedule.scheduleJob(scheduleConfig, executeRequest);
 }
 
 function isExecuting() { 
