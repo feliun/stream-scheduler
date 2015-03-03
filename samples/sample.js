@@ -26,7 +26,7 @@ module.exports = (function() {
 	var options = {
 		schedule: '42 * * * *',
 		onStartExec: function() {
-			//the JSONStream library does not play well with setInterval unless we reset it
+			//the JSONStream library does not play well with schedules unless we reset it
 			stream1 = JSONStream.parse('.*');
 			stream1.on('data', function (item) { console.log('This could process a json!', item); });
 		    stream1.on('end', function () { console.log('end JSON!'); });

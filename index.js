@@ -55,7 +55,9 @@ function lastExecutionTime() {
 }
 
 function startExecution() {
-	if (!isExecuting) executeRequest();
+	if (isExecuting) return false;
+	executeRequest();
+	return true;
 }
 
 function updatePipeline(_pipeline) {
