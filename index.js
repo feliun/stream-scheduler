@@ -50,7 +50,7 @@ function isExecuting() {
 	return isExecuting; 
 }
 
-function lastExecutionTime() {
+function getLastExecutionTime() {
 	return lastExecutionTime;
 }
 
@@ -69,5 +69,5 @@ module.exports = {
 	isExecuting: isExecuting,
 	updatePipeline: updatePipeline,
 	startExecution: startExecution,
-	lastExecutionTime: lastExecutionTime
+	getLastExecutionTime: getLastExecutionTime
 }

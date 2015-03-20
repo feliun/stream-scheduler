@@ -48,7 +48,7 @@ After that you will be able to interact with the stream scheduler with the follo
 
 ```
 ss.isExecuting(); //It will tell you if your streaming job is executing at the moment
-ss.lastExecutionTime(); //It will return the last time when it finished executing successfully
+ss.getLastExecutionTime(); //It will return the last time when it finished executing successfully
 ss.startExecution(); //It will force the component to execute the job (unless it's already running)
 ```
 

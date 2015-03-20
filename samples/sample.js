@@ -45,7 +45,7 @@ module.exports = (function() {
 	}, 100);
 
 	setTimeout(function() {
-		console.log('The job executed last time at: ', new Date(ss.lastExecutionTime()));
+		console.log('The job executed last time at: ', new Date(ss.getLastExecutionTime()));
 		ss.startExecution(); //Forcing to execute out of its interval
 	}, 7000)
 })()
